@@ -7,10 +7,10 @@ import plotly.graph_objects as go
 
 st.set_page_config(page_title="Jira Issue Dashboard", layout="wide")
 
-st.title("🚌 Jira Issue Dashboard")
+st.title("Jira Issue Dashboard")
 st.markdown("This dashboard visualizes issue data by type, severity, location, and root cause.")
 
-# 📄 Load structured issue data
+# Load structured issue data
 data = {
     "Chassis Number": [
         "LTPB9G2L4SB000435", "LTPB9G2L6SB000436", "LTPB9G2L5SB000444",
@@ -37,7 +37,7 @@ data = {
 
 df = pd.DataFrame(data)
 
-# 🎨 Color scheme for severity
+# Severity color map
 severity_colors = {
     "Low": "#0000FF",
     "Medium": "#008000",
@@ -45,7 +45,7 @@ severity_colors = {
     "Critical": "#E74C3C"
 }
 
-# 🍩 Issue Type Donut
+# Donut Chart: Issue Type
 issue_counts = df["Issue Type"].value_counts().reset_index()
 issue_counts.columns = ["Issue Type", "Count"]
 fig_issue = go.Figure(data=[go.Pie(
@@ -53,9 +53,9 @@ fig_issue = go.Figure(data=[go.Pie(
     values=issue_counts["Count"],
     hole=0.4
 )])
-fig_issue.update_layout(title="🍩 Issue Type Distribution")
+fig_issue.update_layout(title="Issue Type Distribution")
 
-# 🔥 Severity Pie
+# Pie Chart: Severity
 severity_counts = df["Severity"].value_counts().reset_index()
 severity_counts.columns = ["Severity", "Count"]
 fig_severity = go.Figure(data=[go.Pie(
@@ -63,9 +63,9 @@ fig_severity = go.Figure(data=[go.Pie(
     values=severity_counts["Count"],
     marker=dict(colors=[severity_colors.get(s, "#ccc") for s in severity_counts["Severity"]])
 )])
-fig_severity.update_layout(title="🔥 Severity Breakdown")
+fig_severity.update_layout(title="Severity Breakdown")
 
-# 🚍 Chassis Bar
+# Bar Chart: Most Affected Chassis
 chassis_counts = df["Chassis Number"].value_counts().reset_index()
 chassis_counts.columns = ["Chassis Number", "Issue Count"]
 fig_chassis = px.bar(
@@ -73,11 +73,11 @@ fig_chassis = px.bar(
     x="Chassis Number",
     y="Issue Count",
     color="Issue Count",
-    title="🚍 Issues per Chassis",
+    title="Issues per Chassis",
     text_auto=True
 )
 
-# 🧱 Severity by Type
+# Stacked Bar: Severity by Issue Type
 severity_order = ["Low", "Medium", "High", "Critical"]
 df["Severity"] = pd.Categorical(df["Severity"], categories=severity_order, ordered=True)
 fig_sev_type = px.histogram(
@@ -85,24 +85,24 @@ fig_sev_type = px.histogram(
     x="Issue Type",
     color="Severity",
     category_orders={"Severity": severity_order},
-    title="🧱 Severity Distribution by Issue Type",
+    title="Severity Distribution by Issue Type",
     barmode="stack",
     color_discrete_map=severity_colors,
     text_auto=True
 )
 
-# 📍 Found Location Pie
+# Pie Chart: Where Issues Were Found
 found_counts = df["Issue Found"].value_counts().reset_index()
 found_counts.columns = ["Found In", "Count"]
 fig_found = px.pie(
     found_counts,
     names="Found In",
     values="Count",
-    title="📍 Where Issues Were Found",
+    title="Where Issues Were Found",
     hole=0.3
 )
 
-# 🔙 Traced Location Donut
+# Donut Chart: Traced Back Source
 traced_counts = df["Issue Traced To"].value_counts().reset_index()
 traced_counts.columns = ["Traced To", "Count"]
 fig_traced = go.Figure(data=[go.Pie(
@@ -110,9 +110,9 @@ fig_traced = go.Figure(data=[go.Pie(
     values=traced_counts["Count"],
     hole=0.45
 )])
-fig_traced.update_layout(title="🔙 Issue Traced Back To")
+fig_traced.update_layout(title="Issue Traced Back To")
 
-# 📊 Display visualizations
+# Render charts
 st.plotly_chart(fig_issue, use_container_width=True)
 st.plotly_chart(fig_severity, use_container_width=True)
 st.plotly_chart(fig_chassis, use_container_width=True)
@@ -120,12 +120,18 @@ st.plotly_chart(fig_sev_type, use_container_width=True)
 st.plotly_chart(fig_found, use_container_width=True)
 st.plotly_chart(fig_traced, use_container_width=True)
 
-# 📌 Insights
-st.subheader("📌 Quick Insights")
-st.markdown(f"- **Most affected chassis:** `{df['Chassis Number'].value_counts().idxmax()}`")
-st.markdown(f"- **Most frequent issue type:** `{df['Issue Type'].value_counts().idxmax()}`")
-st.markdown(f"- **Severity distribution:**")
-severity_pct = df['Severity'].value_counts(normalize=True).mul(100).round(1).astype(str) + "%"
+# Insights
+st.subheader("Quick Insights")
+
+# Check for chassis with multiple issues
+multi_issues = df["Chassis Number"].value_counts()
+high_issue_chassis = multi_issues[multi_issues >= 3]
+
+st.markdown(f"- Chassis with 3 issues:\n{high_issue_chassis.to_string()}")
+
+st.markdown(f"- Most frequent issue type: {df['Issue Type'].value_counts().idxmax()}")
+severity_pct = df["Severity"].value_counts(normalize=True).mul(100).round(1).astype(str) + "%"
+st.markdown("Severity Distribution (%):")
 st.dataframe(severity_pct)
-st.markdown(f"- **Most common location found:** `{df['Issue Found'].value_counts().idxmax()}`")
-st.markdown(f"- **Most common traced source:** `{df['Issue Traced To'].value_counts().idxmax()}`")
+st.markdown(f"- Most common issue location: {df['Issue Found'].value_counts().idxmax()}")
+st.markdown(f"- Most common trace-back source: {df['Issue Traced To'].value_counts().idxmax()}")
