@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 
 st.set_page_config(page_title="Jira Issue Dashboard", layout="wide")
 
-st.title("🚌 Jira Issue Dashboard")
+st.title("Jira Issue Dashboard bus 21-24")
 st.markdown("This dashboard visualizes issue data by type, severity, location, and root cause.")
 
 # 📄 Load structured issue data
@@ -53,7 +53,7 @@ fig_issue = go.Figure(data=[go.Pie(
     values=issue_counts["Count"],
     hole=0.4
 )])
-fig_issue.update_layout(title="🍩 Issue Type Distribution")
+fig_issue.update_layout(title=" Issue Type Distribution")
 
 # 🔥 Severity Pie
 severity_counts = df["Severity"].value_counts().reset_index()
@@ -63,7 +63,7 @@ fig_severity = go.Figure(data=[go.Pie(
     values=severity_counts["Count"],
     marker=dict(colors=[severity_colors.get(s, "#ccc") for s in severity_counts["Severity"]])
 )])
-fig_severity.update_layout(title="🔥 Severity Breakdown")
+fig_severity.update_layout(title="Severity Breakdown")
 
 # 🚍 Chassis Bar
 chassis_counts = df["Chassis Number"].value_counts().reset_index()
@@ -73,11 +73,11 @@ fig_chassis = px.bar(
     x="Chassis Number",
     y="Issue Count",
     color="Issue Count",
-    title="🚍 Issues per Chassis",
+    title="Issues per Chassis",
     text_auto=True
 )
 
-# 🧱 Severity by Type
+#  Severity by Type
 severity_order = ["Low", "Medium", "High", "Critical"]
 df["Severity"] = pd.Categorical(df["Severity"], categories=severity_order, ordered=True)
 fig_sev_type = px.histogram(
@@ -85,7 +85,7 @@ fig_sev_type = px.histogram(
     x="Issue Type",
     color="Severity",
     category_orders={"Severity": severity_order},
-    title="🧱 Severity Distribution by Issue Type",
+    title=" Severity Distribution by Issue Type",
     barmode="stack",
     color_discrete_map=severity_colors,
     text_auto=True
@@ -98,11 +98,11 @@ fig_found = px.pie(
     found_counts,
     names="Found In",
     values="Count",
-    title="📍 Where Issues Were Found",
+    title="Where Issues Were Found",
     hole=0.3
 )
 
-# 🔙 Traced Location Donut
+#  Traced Location Donut
 traced_counts = df["Issue Traced To"].value_counts().reset_index()
 traced_counts.columns = ["Traced To", "Count"]
 fig_traced = go.Figure(data=[go.Pie(
@@ -110,7 +110,7 @@ fig_traced = go.Figure(data=[go.Pie(
     values=traced_counts["Count"],
     hole=0.45
 )])
-fig_traced.update_layout(title="🔙 Issue Traced Back To")
+fig_traced.update_layout(title="Issue Traced Back To")
 
 # 📊 Display visualizations
 st.plotly_chart(fig_issue, use_container_width=True)
