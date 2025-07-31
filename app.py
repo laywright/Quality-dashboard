@@ -123,12 +123,6 @@ st.plotly_chart(fig_traced, use_container_width=True)
 # Insights
 st.subheader("Quick Insights")
 
-# Check for chassis with multiple issues
-multi_issues = df["Chassis Number"].value_counts()
-high_issue_chassis = multi_issues[multi_issues >= 3]
-
-st.markdown(f"- Chassis with most issues:\n ")
-
 st.markdown(f"- Most frequent issue type: {df['Issue Type'].value_counts().idxmax()}")
 severity_pct = df["Severity"].value_counts(normalize=True).mul(100).round(1).astype(str) + "%"
 st.markdown("Severity Distribution (%):")
