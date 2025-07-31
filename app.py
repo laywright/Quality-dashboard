@@ -16,7 +16,11 @@ uploaded_file = st.file_uploader("Upload Excel file", type=["xlsx"])
 if uploaded_file:
     # 📄 Load data
     df = pd.read_excel(uploaded_file, engine='openpyxl')
-    
+
+    # 🚫 Drop specific chassis numbers
+    exclude_chassis = ["LTPB9G2L3SB000426", "LTPB9G2L2SB000434"]
+    df = df[~df['Affected Chassis Number'].isin(exclude_chassis)]
+
     # 🔍 Preview
     st.subheader("📄 Data Preview")
     st.dataframe(df.head())
@@ -35,7 +39,7 @@ if uploaded_file:
     chassis_counts = df['Affected Chassis Number'].value_counts().reset_index()
     chassis_counts.columns = ['Chassis Number', 'Count']
     fig_bar = px.bar(chassis_counts.head(10), x='Chassis Number', y='Count',
-                     title='Top 10 Affected Chassis Numbers',
+                     title='Affected Chassis Numbers',
                      labels={'Count': 'Number of Issues'})
     st.plotly_chart(fig_bar, use_container_width=True)
 
@@ -78,6 +82,5 @@ if uploaded_file:
     st.markdown(f"• **Most common issue type:** {issue_type_counts.iloc[0]['Issue Type']} ({issue_type_counts.iloc[0]['Count']} cases)")
     st.markdown(f"• **Chassis with most issues:** {chassis_counts.iloc[0]['Chassis Number']} ({chassis_counts.iloc[0]['Count']} issues)")
     st.markdown(f"• **Most frequent severity:** {severity_counts.iloc[0]['Severity']} ({severity_counts.iloc[0]['Count']} issues)")
-    st.markdown("• ✅ *Recommendation:* Focus audits on the top 3 chassis numbers and critical/high severity issue types.")
 else:
     st.info("📎 Please upload a valid Excel file to get started.")
