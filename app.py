@@ -5,7 +5,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-st.set_page_config(page_title="Jira Issue Dashboard Bus 21-24", layout="wide")
+st.set_page_config(page_title="Jira Issue Dashboard", layout="wide")
 
 st.title("Jira Issue Dashboard")
 st.markdown("This dashboard visualizes issue data by type, severity, location, and root cause.")
@@ -129,6 +129,8 @@ high_issue_chassis = multi_issues[multi_issues >= 3]
 
 st.markdown(f"- Chassis with 3 issues:\n{high_issue_chassis.to_string()}")
 
+st.markdown(f"- Most frequent issue type: {df['Issue Type'].value_counts().idxmax()}")
+severity_pct = df["Severity"].value_counts(normalize=True).mul(100).round(1).astype(str) + "%"
 st.markdown("Severity Distribution (%):")
 st.dataframe(severity_pct)
 st.markdown(f"- Most common issue location: {df['Issue Found'].value_counts().idxmax()}")
